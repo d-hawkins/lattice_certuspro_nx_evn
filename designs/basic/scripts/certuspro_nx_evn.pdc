@@ -1,0 +1,87 @@
+# -----------------------------------------------------------------------------
+# certuspro_nx_evn.pdc
+#
+# 4/25/2025 D. W. Hawkins (dwh@caltech.edu)
+#
+# Lattice CertusPro-NX Evaluation Board Physical Design Constraints.
+#
+# -----------------------------------------------------------------------------
+# References
+# ----------
+#
+# [1] Lattice, "CertusPro-NX Evaluation Board", 2025
+#     https://www.latticesemi.com/products/developmentboardsandkits/certuspro-nxevaluationboard
+#     Ordering Part Number: LFCPNX-EVN
+#
+# [2] Lattice Semiconductor, "CertusPro-NX Evaluation Board Schematic",
+#     Revision 1.0, Aug 2021 (SCHEM_LFCPNX-EVN_REVB_08042021.pdf).
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Started Message
+# -----------------------------------------------------------------------------
+#
+puts "[string repeat = 80]"
+puts "certuspro_nx_evn.pdc: Started"
+puts "[string repeat - 80]"
+
+# -----------------------------------------------------------------------------
+# Bank 0 and Bank 1 voltages
+# -----------------------------------------------------------------------------
+#
+# Per the schematic [2]:
+#
+#  Bank  VCCIO   Common  Voltage
+#  ----  ------  ------  -------
+#   0    VCCIO0          1.8V (default) or 3.3V
+#   1    VCCIO1          3.3V
+#   2    VCCIO2          1.8V, 2.5V, or 3.3V (default)
+#   3    VCCIO3  3+4+5   1.2V, 1.8V (default), or VCC_ADJ
+#   4    VCCIO4  3+4+5
+#   5    VCCIO5  3+4+5
+#   6    VCCIO6          1.8V, 2.5V, or 3.3V (default)
+#   7    VCCIO7          1.8V, 2.5V, or 3.3V (default)
+#
+# Banks 3+4+5 are the high-performance banks. They connect to the FMC.
+#
+ldc_set_vcc -bank 0 1.8
+ldc_set_vcc -bank 1 3.3
+ldc_set_vcc -bank 2 3.3
+ldc_set_vcc -bank 3 1.8
+ldc_set_vcc -bank 4 1.8
+ldc_set_vcc -bank 5 1.8
+ldc_set_vcc -bank 6 3.3
+ldc_set_vcc -bank 7 3.3
+
+# sysCONFIG settings
+ldc_set_sysconfig {CONFIGIO_VOLTAGE_BANK0=1.8 CONFIGIO_VOLTAGE_BANK1=3.3}
+
+# -----------------------------------------------------------------------------
+# Clock
+# -----------------------------------------------------------------------------
+#
+# 12MHz from the FTDI device oscillator
+#  * Alternatively use 125MHz on pin N25
+ldc_set_location -site {R4} [get_ports clk_12mhz]
+
+# -----------------------------------------------------------------------------
+# LEDs
+# -----------------------------------------------------------------------------
+#
+# Green LEDs pins
+set pins [list N5 N6 N7 N8 L6 N9 L8 M9]
+
+# Pin constraints
+for {set i 0} {$i < 8} {incr i} {
+	# LED port name
+	set port led\[$i\]
+
+	# Pin assignment
+	set pin [lindex $pins $i]
+	ldc_set_location -site $pin [get_ports $port]
+
+	# Drive and slew rate
+	ldc_set_port -iobuf {DRIVE=8 SLEWRATE=MED} [get_ports $port]
+}
+
