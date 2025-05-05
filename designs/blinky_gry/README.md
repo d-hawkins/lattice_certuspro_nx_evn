@@ -32,7 +32,7 @@ The top-level design parameter USEIOFF controls whether the LED outputs are regi
    Click on the "Query" tab, add the LEDs to the analysis, change the temperature to 0C, and click "Search".  
    This displays the worst-case timing slack. The 85C timing has higher setup slack, but the same hold slack (as the GUI does not update the hold timing).  
    Click on the worst-case setup or hold path to see the clock and data delays.  
-   The timing should match the comments in the SDC file.
+   The timing should match the comments in the parameters.tcl file.
 
 5. Program the board.  
    Power-up and connect to the USB interface on the CertusPro-NX Evaluation Board.  
