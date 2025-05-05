@@ -1,0 +1,146 @@
+# -----------------------------------------------------------------------------
+# certuspro_nx_evn.pdc
+#
+# 4/25/2025 D. W. Hawkins (dwh@caltech.edu)
+#
+# Lattice CertusPro-NX Evaluation Board Physical Design Constraints.
+#
+# -----------------------------------------------------------------------------
+# Notes
+# -----
+#
+# 1. Console messages
+#
+#    Opening the Radiant "Device Constraint Editor" and "Physical Designer"
+#    GUIs causes the .pdc file to be re-read but does not define stdout for
+#    the underlying Tcl interpreter. This results in the puts command failing.
+#    The puts messages were wrapped in catch to suppress those errors.
+#
+# -----------------------------------------------------------------------------
+
+# Radiant 2024.2.1 has version 0.4.1
+package require yaml
+
+# -----------------------------------------------------------------------------
+# Started Message
+# -----------------------------------------------------------------------------
+#
+catch {puts "[string repeat = 80]"}
+catch {puts "certuspro_nx_evn.pdc: Started"}
+catch {puts "[string repeat - 80]"}
+
+# -----------------------------------------------------------------------------
+# Directories
+# -----------------------------------------------------------------------------
+#
+catch {puts "certuspro_nx_evn.pdc: pwd = [pwd]"}
+
+# Find the parameters YAML file
+# * This script is called from the build directory radiant or radiant/impl_1
+set filename parameters.yml
+if {![file exists $filename]} {
+	set filename ../parameters.yml
+	if {![file exists $filename]} {
+		error "certuspro_nx_evn.pdc: Error parameters file not found!"
+	}
+}
+
+# Read the YAML file and convert to dictionary
+set fd [open $filename r]
+set buffer [read $fd]
+close $fd
+set params [::yaml::yaml2dict $buffer]
+
+# Repository path
+set repo   [dict get $params REPO]
+
+# Design name
+#set design [dict get $params DESIGN]
+
+# -----------------------------------------------------------------------------
+# Physical Constraints Utilities Script
+# -----------------------------------------------------------------------------
+#
+source $repo/tcl/constraints_pdc_utils.tcl
+
+# -----------------------------------------------------------------------------
+# Bank voltages
+# -----------------------------------------------------------------------------
+#
+set_bank_voltage_constraints
+
+# -----------------------------------------------------------------------------
+# Pin Constraints
+# -----------------------------------------------------------------------------
+#
+# Pin constraints (for all pins)
+set pin_constraints [get_pin_constraints]
+
+# Design-specific constraints modifications
+# -----------------------------------------
+#
+# The top-level SystemVerilog design uses the port name led[]. The board
+# implements Green, Red, and Yellow LEDs. The following maps the led[] port
+# to the Green LEDs (and can be edited to use Red or Yellow).
+#
+# The SDC timing constraints were optimized for Green, but the constraints
+# also work for Red and Yellow, but the reported slack changes.
+#
+# Select the LEDs: g, r, or y
+set led g
+for {set i 0} {$i < 8} {incr i} {
+	switch $led {
+		g {
+			# Green LEDs
+			set val [dict get $pin_constraints led_g(${i})]
+		}
+		r {
+			# Red LEDs
+			set val [dict get $pin_constraints led_r(${i})]
+		}
+		y {
+			# Yellow LEDs
+			set val [dict get $pin_constraints led_y(${i})]
+		}
+		default {
+			error "certuspro_nx_evn.pdc: Error: Invalid LED selection!"
+		}
+	}
+
+	# Customize some DRIVE and SLEWRATE settings
+	switch $i {
+		0 {
+			dict set val DRIVE 2
+			dict set val SLEWRATE FAST
+		}
+		1 {
+			dict set val DRIVE 4
+			dict set val SLEWRATE FAST
+		}
+		2 {
+			dict set val DRIVE 8
+			dict set val SLEWRATE FAST
+		}
+		3 {
+			dict set val DRIVE 12
+			dict set val SLEWRATE FAST
+		}
+	}
+
+	# Add new dictionary entries for the led[] bits
+	dict set pin_constraints led(${i}) $val
+}
+
+# Pins used in this design
+set ports [lsort [get_ports *]]
+
+# Apply the pin constraints
+apply_pin_constraints $ports $pin_constraints
+
+# -----------------------------------------------------------------------------
+# Ended Message
+# -----------------------------------------------------------------------------
+#
+catch {puts "[string repeat - 80]"}
+catch {puts "certuspro_nx_evn.pdc: Ended"}
+catch {puts "[string repeat = 80]"}
