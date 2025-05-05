@@ -1,0 +1,99 @@
+# -----------------------------------------------------------------------------
+# certuspro_nx_evn.sdc
+#
+# DATE_VAL D. W. Hawkins (dwh@caltech.edu)
+#
+# Lattice Radiant Timing Constraints.
+#
+#  *** WARNING: This is a generated file ***
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Design Parameters
+# -----------------------------------------------------------------------------
+#
+set USEIOFF             USEIOFF_VAL
+set CLK_12MHZ_FREQUENCY CLK_12MHZ_FREQUENCY_VAL
+set CLK_HFOSC_FREQUENCY CLK_HFOSC_FREQUENCY_VAL
+set CLK_LFOSC_FREQUENCY CLK_LFOSC_FREQUENCY_VAL
+set LED_G_OUTPUT_MIN    LED_G_OUTPUT_MIN_VAL
+set LED_G_OUTPUT_MAX    LED_G_OUTPUT_MAX_VAL
+set LED_R_OUTPUT_MIN    LED_R_OUTPUT_MIN_VAL
+set LED_R_OUTPUT_MAX    LED_R_OUTPUT_MAX_VAL
+set LED_Y_OUTPUT_MIN    LED_Y_OUTPUT_MIN_VAL
+set LED_Y_OUTPUT_MAX    LED_Y_OUTPUT_MAX_VAL
+
+# =============================================================================
+# 12MHz Clock Domain
+# =============================================================================
+#
+# -----------------------------------------------------------------------------
+# Clock Constraints
+# -----------------------------------------------------------------------------
+#
+set clk_12mhz_period [format "%.3f" [expr {1.0e9/$CLK_12MHZ_FREQUENCY}]]
+create_clock -name {clk_12mhz} -period $clk_12mhz_period [get_ports clk_12mhz]
+set_clock_groups -group [get_clocks clk_12mhz] -asynchronous
+
+# -----------------------------------------------------------------------------
+# Output Constraints
+# -----------------------------------------------------------------------------
+#
+# Constraints
+set min -$LED_G_OUTPUT_MIN
+set max [expr {$clk_12mhz_period - $LED_G_OUTPUT_MAX}]
+
+# Green LEDs
+set_output_delay -clock [get_clocks clk_12mhz] -min $min [get_ports {led_g[*]}]
+set_output_delay -clock [get_clocks clk_12mhz] -max $max [get_ports {led_g[*]}]
+
+# =============================================================================
+# HFOSC Clock Domain
+# =============================================================================
+#
+# -----------------------------------------------------------------------------
+# Clock Constraints
+# -----------------------------------------------------------------------------
+#
+set clk_hfosc_period [format "%.3f" [expr {1.0e9/$CLK_HFOSC_FREQUENCY}]]
+create_clock -name {clk_hfosc} -period $clk_hfosc_period \
+	[get_pins {u1/HFCLKOUT}]
+set_clock_groups -group [get_clocks clk_hfosc] -asynchronous
+
+# -----------------------------------------------------------------------------
+# Output Constraints
+# -----------------------------------------------------------------------------
+#
+# Constraints
+set min -$LED_R_OUTPUT_MIN
+set max [expr {$clk_hfosc_period - $LED_R_OUTPUT_MAX}]
+
+# Red LEDs
+set_output_delay -clock [get_clocks clk_hfosc] -min $min [get_ports {led_r[*]}]
+set_output_delay -clock [get_clocks clk_hfosc] -max $max [get_ports {led_r[*]}]
+
+# =============================================================================
+# LFOSC Clock Domain
+# =============================================================================
+#
+# -----------------------------------------------------------------------------
+# Clock Constraints
+# -----------------------------------------------------------------------------
+#
+set clk_lfosc_period [format "%.3f" [expr {1.0e9/$CLK_LFOSC_FREQUENCY}]]
+create_clock -name {clk_lfosc} -period $clk_lfosc_period \
+	[get_pins {u1/LFCLKOUT}]
+set_clock_groups -group [get_clocks clk_lfosc] -asynchronous
+
+# -----------------------------------------------------------------------------
+# Output Constraints
+# -----------------------------------------------------------------------------
+#
+# Constraints
+set min -$LED_Y_OUTPUT_MIN
+set max [expr {$clk_lfosc_period - $LED_Y_OUTPUT_MAX}]
+
+# Yellow LEDs
+set_output_delay -clock [get_clocks clk_lfosc] -min $min [get_ports {led_y[*]}]
+set_output_delay -clock [get_clocks clk_lfosc] -max $max [get_ports {led_y[*]}]
