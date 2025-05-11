@@ -22,7 +22,10 @@
 # and then writes the design timing constraints to a YAML file in the build
 # directory.
 #
-proc get_timing_parameters {useioff} {
+proc get_timing_parameters {hdl_param} {
+
+	# Extract the USEIOFF setting
+	set useioff [get_hdl_param $hdl_param USEIOFF]
 
 	# Clock frequencies
 	set clk_12mhz_frequency 12.000e6
@@ -61,10 +64,10 @@ proc get_timing_parameters {useioff} {
 		# | Delay Type |    Green       |      Red       |    Yellow      |
 		# |            |  Min     Max   |  Min     Max   |  Min     Max   |
 		# |------------|----------------|----------------|----------------|
-		# | Actual     | 6.935   9.453  | 5.940   8.528  | 5.922   8.292  |
-		# | Constraint | 6.800   9.600  | 5.800   8.700  | 5.800   8.400  |
-		# | Slack      | 0.135   0.147  | 0.140   0.172  | 0.122   0.108  |
-		# | LED        | g[2]    g[7]   | r[7]    r[0]   | y[0]    y[6]   |
+		# | Actual     | 6.859   9.581  | 5.980   8.490  | 5.940   8.620  |
+		# | Constraint | 6.700   9.700  | 5.800   8.600  | 5.800   8.800  |
+		# | Slack      | 0.159   0.119  | 0.180   0.110  | 0.140   0.180  |
+		# | LED        | g[4]    g[3]   | r[2]    r[7]   | y[2]    y[1]   |
 		#  ---------------------------------------------------------------
 		#
 		set params [list \
@@ -72,12 +75,12 @@ proc get_timing_parameters {useioff} {
 			CLK_12MHZ_FREQUENCY  $clk_12mhz_frequency \
 			CLK_HFOSC_FREQUENCY  $clk_hfosc_frequency \
 			CLK_LFOSC_FREQUENCY  $clk_lfosc_frequency \
-			LED_G_OUTPUT_MIN     6.8                  \
-			LED_G_OUTPUT_MAX     9.6                  \
+			LED_G_OUTPUT_MIN     6.7                  \
+			LED_G_OUTPUT_MAX     9.7                  \
 			LED_R_OUTPUT_MIN     5.8                  \
-			LED_R_OUTPUT_MAX     8.7                  \
+			LED_R_OUTPUT_MAX     8.6                  \
 			LED_Y_OUTPUT_MIN     5.8                  \
-			LED_Y_OUTPUT_MAX     8.4                  \
+			LED_Y_OUTPUT_MAX     8.8                  \
 		]
 	}
 	return $params
@@ -98,9 +101,6 @@ proc get_timing_parameters {useioff} {
 #
 proc parameters_update {repo board design build hdl_param} {
 
-	# Extract the USEIOFF setting
-	set useioff [get_hdl_param $hdl_param USEIOFF]
-
 	# Update the YAML file
 	set filename $build/parameters.yml
 	yaml_parameters_update $filename $hdl_param
@@ -112,7 +112,7 @@ proc parameters_update {repo board design build hdl_param} {
 	# SDC template and project files
 	set filename_i $repo/designs/$design/scripts/${board}_sdc.txt
 	set filename_o $build/${board}.sdc
-	update_sdc_file $filename_i $filename_o $useioff
+	update_sdc_file $filename_i $filename_o $hdl_param
 
 	return
 }

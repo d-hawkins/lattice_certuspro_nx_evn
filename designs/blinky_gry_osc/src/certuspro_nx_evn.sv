@@ -72,10 +72,19 @@ module certuspro_nx_evn #(
 	wire clk_hfosc;
 	wire clk_lfosc;
 
-	// Counter
-	logic [WIDTH_12MHZ-1:0] count_12mhz;
-	logic [WIDTH_HFOSC-1:0] count_hfosc;
-	logic [WIDTH_LFOSC-1:0] count_lfosc;
+	// Counters
+	logic [WIDTH_12MHZ-1:0] count_g;
+	logic [WIDTH_HFOSC-1:0] count_r;
+	logic [WIDTH_LFOSC-1:0] count_y;
+
+	// LED brightness control
+	logic led_duty_g;
+	logic led_duty_r;
+
+	// LED fabric registers
+	logic [7:0] led_fabric_g;
+	logic [7:0] led_fabric_r;
+	logic [7:0] led_fabric_y;
 
 	// ------------------------------------------------------------------------
 	// Internal Oscillator
@@ -111,15 +120,40 @@ module certuspro_nx_evn #(
 	// Use a down counter, so that the LEDs show an up count.
 	//
 	always_ff @(posedge clk_12mhz) begin
-		count_12mhz <= count_12mhz - 1'b1;
+		count_g <= count_g - 1'b1;
 	end
 
 	always_ff @(posedge clk_hfosc) begin
-		count_hfosc <= count_hfosc - 1'b1;
+		count_r <= count_r - 1'b1;
 	end
 
 	always_ff @(posedge clk_lfosc) begin
-		count_lfosc <= count_lfosc - 1'b1;
+		count_y <= count_y - 1'b1;
+	end
+
+	// ------------------------------------------------------------------------
+	// LED brightness control
+	// ------------------------------------------------------------------------
+	//
+	// 12.5% duty-cycle
+	assign led_duty_g = (count_g[(WIDTH_12MHZ-16) +: 3] == 3'h0) ? 1'b1 : 1'b0;
+	assign led_duty_r = (count_r[(WIDTH_HFOSC-16) +: 3] == 3'h0) ? 1'b1 : 1'b0;
+
+	// ------------------------------------------------------------------------
+	// LED fabric registers
+	// ------------------------------------------------------------------------
+	//
+	// Reduce the brightness of the Green and Red LEDs
+	always_ff @(posedge clk_12mhz) begin
+		led_fabric_g <= led_duty_g ? count_g[(WIDTH_12MHZ-1) -: 8] : 8'hFF;
+	end
+
+	always_ff @(posedge clk_hfosc) begin
+		led_fabric_r <= led_duty_r ? count_r[(WIDTH_HFOSC-1) -: 8] : 8'hFF;
+	end
+
+	always_ff @(posedge clk_lfosc) begin
+		led_fabric_y <= count_y[(WIDTH_LFOSC-1) -: 8];
 	end
 
 	// ------------------------------------------------------------------------
@@ -149,13 +183,13 @@ module certuspro_nx_evn #(
 		logic [7:0] led_iob_r /* synthesis syn_preserve = 1 syn_useioff = 0 */;
 		logic [7:0] led_iob_y /* synthesis syn_preserve = 1 syn_useioff = 0 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob_g <= count_12mhz[(WIDTH_12MHZ-1) -: 8];
+			led_iob_g <= led_fabric_g;
 		end
 		always_ff @(posedge clk_hfosc) begin
-			led_iob_r <= count_hfosc[(WIDTH_HFOSC-1) -: 8];
+			led_iob_r <= led_fabric_r;
 		end
 		always_ff @(posedge clk_lfosc) begin
-			led_iob_y <= count_lfosc[(WIDTH_LFOSC-1) -: 8];
+			led_iob_y <= led_fabric_y;
 		end
 		assign led_g = led_iob_g;
 		assign led_r = led_iob_r;
@@ -168,13 +202,13 @@ module certuspro_nx_evn #(
 		logic [7:0] led_iob_r /* synthesis syn_preserve = 1 syn_useioff = 1 */;
 		logic [7:0] led_iob_y /* synthesis syn_preserve = 1 syn_useioff = 1 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob_g <= count_12mhz[(WIDTH_12MHZ-1) -: 8];
+			led_iob_g <= led_fabric_g;
 		end
 		always_ff @(posedge clk_hfosc) begin
-			led_iob_r <= count_hfosc[(WIDTH_HFOSC-1) -: 8];
+			led_iob_r <= led_fabric_r;
 		end
 		always_ff @(posedge clk_lfosc) begin
-			led_iob_y <= count_lfosc[(WIDTH_LFOSC-1) -: 8];
+			led_iob_y <= led_fabric_y;
 		end
 		assign led_g = led_iob_g;
 		assign led_r = led_iob_r;
