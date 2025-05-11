@@ -22,7 +22,10 @@
 # and then writes the design timing constraints to a YAML file in the build
 # directory.
 #
-proc get_timing_parameters {useioff} {
+proc get_timing_parameters {hdl_param} {
+
+	# Extract the USEIOFF setting
+	set useioff [get_hdl_param $hdl_param USEIOFF]
 
 	# Clock frequency
 	set clk_12mhz_frequency 12.000e6
@@ -53,17 +56,17 @@ proc get_timing_parameters {useioff} {
 		# | Delay Type |   G+R+Y LEDs   |
 		# |            |  Min     Max   |
 		# |------------|----------------|
-		# | Actual     | 6.859   9.635  |
-		# | Constraint | 6.700   9.800  |
-		# | Slack      | 0.159   0.165  |
-		# | LED        | y[7]    r[1]   |
+		# | Actual     | 6.859   9.584  |
+		# | Constraint | 6.700   9.700  |
+		# | Slack      | 0.159   0.116  |
+		# | LED        | y[0]    g[0]   |
 		#  -----------------------------
 		#
 		set params [list \
 			USEIOFF              $useioff             \
 			CLK_12MHZ_FREQUENCY  $clk_12mhz_frequency \
 			LED_OUTPUT_MIN       6.7                  \
-			LED_OUTPUT_MAX       9.8                  \
+			LED_OUTPUT_MAX       9.7                  \
 		]
 	}
 	return $params
@@ -84,9 +87,6 @@ proc get_timing_parameters {useioff} {
 #
 proc parameters_update {repo board design build hdl_param} {
 
-	# Extract the USEIOFF setting
-	set useioff [get_hdl_param $hdl_param USEIOFF]
-
 	# Update the YAML file
 	set filename $build/parameters.yml
 	yaml_parameters_update $filename $hdl_param
@@ -98,7 +98,7 @@ proc parameters_update {repo board design build hdl_param} {
 	# SDC template and project files
 	set filename_i $repo/designs/$design/scripts/${board}_sdc.txt
 	set filename_o $build/${board}.sdc
-	update_sdc_file $filename_i $filename_o $useioff
+	update_sdc_file $filename_i $filename_o $hdl_param
 
 	return
 }

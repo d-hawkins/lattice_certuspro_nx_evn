@@ -61,6 +61,12 @@ module certuspro_nx_evn #(
 	// Counter
 	logic [WIDTH-1:0] count;
 
+	// LED brightness control
+	logic led_duty;
+
+	// LED fabric registers
+	logic [7:0] led_fabric;
+
 	// ------------------------------------------------------------------------
 	// Counter
 	// ------------------------------------------------------------------------
@@ -70,6 +76,22 @@ module certuspro_nx_evn #(
 	//
 	always_ff @(posedge clk_12mhz) begin
 		count <= count - 1'b1;
+	end
+
+	// ------------------------------------------------------------------------
+	// LED brightness control
+	// ------------------------------------------------------------------------
+	//
+	// 12.5% duty-cycle
+	assign led_duty = (count[2:0] == 3'h0) ? 1'b1 : 1'b0;
+
+	// ------------------------------------------------------------------------
+	// LED fabric registers
+	// ------------------------------------------------------------------------
+	//
+	// Reduce the brightness of the Green LEDs
+	always_ff @(posedge clk_12mhz) begin
+		led_fabric <= led_duty ? count[(WIDTH-1) -: 8] : 8'hFF;
 	end
 
 	// ------------------------------------------------------------------------
@@ -99,9 +121,9 @@ module certuspro_nx_evn #(
 		logic [7:0] led_iob_r /* synthesis syn_preserve = 1 syn_useioff = 0 */;
 		logic [7:0] led_iob_y /* synthesis syn_preserve = 1 syn_useioff = 0 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob_g <= count[(WIDTH-1) -: 8];
-			led_iob_r <= count[(WIDTH-1) -: 8];
-			led_iob_y <= count[(WIDTH-1) -: 8];
+			led_iob_g <= led_fabric;
+			led_iob_r <= led_fabric;
+			led_iob_y <= led_fabric;
 		end
 		assign led_g = led_iob_g;
 		assign led_r = led_iob_r;
@@ -114,9 +136,9 @@ module certuspro_nx_evn #(
 		logic [7:0] led_iob_r /* synthesis syn_preserve = 1 syn_useioff = 1 */;
 		logic [7:0] led_iob_y /* synthesis syn_preserve = 1 syn_useioff = 1 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob_g <= count[(WIDTH-1) -: 8];
-			led_iob_r <= count[(WIDTH-1) -: 8];
-			led_iob_y <= count[(WIDTH-1) -: 8];
+			led_iob_g <= led_fabric;
+			led_iob_r <= led_fabric;
+			led_iob_y <= led_fabric;
 		end
 		assign led_g = led_iob_g;
 		assign led_r = led_iob_r;
