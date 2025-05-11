@@ -57,6 +57,12 @@ module certuspro_nx_evn #(
 	// Counter
 	logic [WIDTH-1:0] count;
 
+	// LED brightness control
+	logic led_duty;
+
+	// LED fabric registers
+	logic [7:0] led_fabric;
+
 	// ------------------------------------------------------------------------
 	// Counter
 	// ------------------------------------------------------------------------
@@ -66,6 +72,22 @@ module certuspro_nx_evn #(
 	//
 	always_ff @(posedge clk_12mhz) begin
 		count <= count - 1'b1;
+	end
+
+	// ------------------------------------------------------------------------
+	// LED brightness control
+	// ------------------------------------------------------------------------
+	//
+	// 12.5% duty-cycle
+	assign led_duty = (count[2:0] == 3'h0) ? 1'b1 : 1'b0;
+
+	// ------------------------------------------------------------------------
+	// LED fabric registers
+	// ------------------------------------------------------------------------
+	//
+	// Reduce the brightness of the Green LEDs
+	always_ff @(posedge clk_12mhz) begin
+		led_fabric <= led_duty ? count[(WIDTH-1) -: 8] : 8'hFF;
 	end
 
 	// ------------------------------------------------------------------------
@@ -93,7 +115,7 @@ module certuspro_nx_evn #(
 	if (USEIOFF == 0) begin: g0
 		logic [7:0] led_iob /* synthesis syn_useioff = 0 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob <= count[(WIDTH-1) -: 8];
+			led_iob <= led_fabric;
 		end
 		assign led = led_iob;
 	end
@@ -102,7 +124,7 @@ module certuspro_nx_evn #(
 	if (USEIOFF == 1) begin: g1
 		logic [7:0] led_iob /* synthesis syn_useioff = 1 */;
 		always_ff @(posedge clk_12mhz) begin
-			led_iob <= count[(WIDTH-1) -: 8];
+			led_iob <= led_fabric;
 		end
 		assign led = led_iob;
 	end

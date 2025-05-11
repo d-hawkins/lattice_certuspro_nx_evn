@@ -26,7 +26,10 @@
 # Red and Yellow pass timing with these same constraints but the slack
 # changes.
 #
-proc get_timing_parameters {useioff} {
+proc get_timing_parameters {hdl_param} {
+
+	# Extract the USEIOFF setting
+	set useioff [get_hdl_param $hdl_param USEIOFF]
 
 	# Clock frequency
 	set clk_12mhz_frequency 12.000e6
@@ -35,7 +38,7 @@ proc get_timing_parameters {useioff} {
 		#
 		#  I/O register delays at 0C
 		#  -----------------------------
-		# | Delay Type |   G+R+Y LEDs   |
+		# | Delay Type |   Green LEDs   |
 		# |            |  Min     Max   |
 		# |------------|----------------|
 		# | Actual     | 4.669   9.173  |
@@ -54,20 +57,20 @@ proc get_timing_parameters {useioff} {
 		#
 		#  Fabric register delays at 0C
 		#  -----------------------------
-		# | Delay Type |   G+R+Y LEDs   |
+		# | Delay Type |   Green LEDs   |
 		# |            |  Min     Max   |
 		# |------------|----------------|
-		# | Actual     | 4.665   9.746  |
-		# | Constraint | 4.500   9.900  |
-		# | Slack      | 0.165   0.154  |
-		# | LED        | g[3]    g[4]   |
+		# | Actual     | 4.740  10.223  |
+		# | Constraint | 4.600  10.400  |
+		# | Slack      | 0.140   0.177  |
+		# | LED        | g[3]    g[6]   |
 		#  -----------------------------
 		#
 		set params [list \
 			USEIOFF              $useioff             \
 			CLK_12MHZ_FREQUENCY  $clk_12mhz_frequency \
-			LED_OUTPUT_MIN       4.5                  \
-			LED_OUTPUT_MAX       9.9                  \
+			LED_OUTPUT_MIN       4.6                  \
+			LED_OUTPUT_MAX      10.4                  \
 		]
 	}
 	return $params
@@ -88,9 +91,6 @@ proc get_timing_parameters {useioff} {
 #
 proc parameters_update {repo board design build hdl_param} {
 
-	# Extract the USEIOFF setting
-	set useioff [get_hdl_param $hdl_param USEIOFF]
-
 	# Update the YAML file
 	set filename $build/parameters.yml
 	yaml_parameters_update $filename $hdl_param
@@ -102,7 +102,7 @@ proc parameters_update {repo board design build hdl_param} {
 	# SDC template and project files
 	set filename_i $repo/designs/$design/scripts/${board}_sdc.txt
 	set filename_o $build/${board}.sdc
-	update_sdc_file $filename_i $filename_o $useioff
+	update_sdc_file $filename_i $filename_o $hdl_param
 
 	return
 }
