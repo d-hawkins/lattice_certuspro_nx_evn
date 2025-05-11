@@ -116,10 +116,10 @@ proc yaml_parameters_update {filename hdl_param} {
 # project during initial creating. The pre-script then updates the contents
 # of the file that is already part of the Radiant project.
 #
-proc update_sdc_file {filename_i filename_o useioff} {
+proc update_sdc_file {filename_i filename_o hdl_param} {
 
 	# Get the timing parameters
-	set params [get_timing_parameters $useioff]
+	set params [get_timing_parameters $hdl_param]
 
 	# Read the SDC template
 	set fd [open $filename_i r]
