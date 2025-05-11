@@ -59,7 +59,6 @@ proc radiant_create_project {params} {
 	set part        [dict get $params PART]
 	set sources     [dict get $params SOURCES]
 	set constraints [dict get $params CONSTRAINTS]
-	set parameters  [dict get $params PARAMETERS]
 
 	# Check for an existing Radiant project
 	set filename "${build}/${board}.rdf"
@@ -120,10 +119,12 @@ proc radiant_create_project {params} {
 	# Turn on "IP Evaluation" so that bitstream generation works
 	prj_set_strategy_value -strategy Strategy1 bit_ip_eval=True
 
-	# Configure HDL parameters
-	if {[string length $parameters]} {
+	# (Optional) Configure HDL parameters
+	if {[dict exists $params PARAMETERS]} {
+
 		# Set the HDL_PARAM
-		prj_set_impl_opt -impl "impl_1" {HDL_PARAM} $parameters
+		prj_set_impl_opt -impl "impl_1" {HDL_PARAM} \
+			[dict get $params PARAMETERS]
 
 		# Pre-script for writing HDL_PARAM to $build/hdl_param.txt
 		# * Use 'syn' so that the HDL parameters file exists for use by .SDC
