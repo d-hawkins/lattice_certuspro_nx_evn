@@ -73,6 +73,14 @@ set buffer [read $fd]
 close $fd
 set params [::yaml::yaml2dict $buffer]
 
+# Check for the keys used in this script
+set keys [list REPO BOARD DESIGN PARAMETERS]
+foreach key $keys {
+	if {![dict exists $params $key]} {
+		error "radiant_hdl_param.tcl: Error $key key missing!"
+	}
+}
+
 # Repository path
 set repo   [dict get $params REPO]
 
@@ -109,7 +117,7 @@ prj_open $filename
 
 # Read the GUI HDL_PARAM entry
 set hdl_param [prj_set_impl_opt -impl "impl_1" {HDL_PARAM}]
-puts "radiant_hdl_param.tcl: HDL_PARAM = \{$hdl_param\]"
+puts "radiant_hdl_param.tcl: HDL_PARAM = \{$hdl_param\}"
 
 prj_close
 
