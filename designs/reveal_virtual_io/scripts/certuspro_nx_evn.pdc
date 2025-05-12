@@ -1,0 +1,116 @@
+# -----------------------------------------------------------------------------
+# certuspro_nx_evn.pdc
+#
+# 4/25/2025 D. W. Hawkins (dwh@caltech.edu)
+#
+# Lattice CertusPro-NX Evaluation Board Physical Design Constraints.
+#
+# -----------------------------------------------------------------------------
+# Notes
+# -----
+#
+# 1. Console messages
+#
+#    Opening the Radiant "Device Constraint Editor" and "Physical Designer"
+#    GUIs causes the .pdc file to be re-read but does not define stdout for
+#    the underlying Tcl interpreter. This results in the puts command failing.
+#    The puts messages were wrapped in catch to suppress those errors.
+#
+# -----------------------------------------------------------------------------
+
+# Radiant 2024.2.1 has version 0.4.1
+package require yaml
+
+# -----------------------------------------------------------------------------
+# Started Message
+# -----------------------------------------------------------------------------
+#
+catch {puts "[string repeat = 80]"}
+catch {puts "certuspro_nx_evn.pdc: Started"}
+catch {puts "[string repeat - 80]"}
+
+# -----------------------------------------------------------------------------
+# Directories
+# -----------------------------------------------------------------------------
+#
+catch {puts "certuspro_nx_evn.pdc: pwd = [pwd]"}
+
+# Find the parameters YAML file
+# * This script is called from the build directory radiant or radiant/impl_1
+set filename parameters.yml
+if {![file exists $filename]} {
+	set filename ../parameters.yml
+	if {![file exists $filename]} {
+		error "certuspro_nx_evn.pdc: Error parameters file not found!"
+	}
+}
+
+# Read the YAML file and convert to dictionary
+set fd [open $filename r]
+set buffer [read $fd]
+close $fd
+set params [::yaml::yaml2dict $buffer]
+
+# Repository path
+set repo   [dict get $params REPO]
+
+# Design name
+#set design [dict get $params DESIGN]
+
+# -----------------------------------------------------------------------------
+# Physical Constraints Utilities Script
+# -----------------------------------------------------------------------------
+#
+source $repo/tcl/constraints_pdc_utils.tcl
+
+# -----------------------------------------------------------------------------
+# Bank voltages
+# -----------------------------------------------------------------------------
+#
+set_bank_voltage_constraints
+
+# -----------------------------------------------------------------------------
+# Pin Constraints
+# -----------------------------------------------------------------------------
+#
+# Pin constraints (for all pins)
+set pin_constraints [get_pin_constraints]
+
+# Pins used in this design
+set ports [lsort [get_ports *]]
+
+# Apply the pin constraints
+apply_pin_constraints $ports $pin_constraints
+
+# -----------------------------------------------------------------------------
+# Asynchronous input synchronizers
+# -----------------------------------------------------------------------------
+#
+ldc_create_group -name group_cdc_g1_0 -bbox {1 1} [get_cells {g1[0].u1 g1[0].u1/meta_i1.ff_inst g1[0].u1/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g1_1 -bbox {1 1} [get_cells {g1[1].u1 g1[1].u1/meta_i1.ff_inst g1[1].u1/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g1_2 -bbox {1 1} [get_cells {g1[2].u1 g1[2].u1/meta_i1.ff_inst g1[2].u1/meta_i2.ff_inst}]
+
+ldc_create_group -name group_cdc_g2_0 -bbox {1 1} [get_cells {g2[0].u2 g2[0].u2/meta_i1.ff_inst g2[0].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_1 -bbox {1 1} [get_cells {g2[1].u2 g2[1].u2/meta_i1.ff_inst g2[1].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_2 -bbox {1 1} [get_cells {g2[2].u2 g2[2].u2/meta_i1.ff_inst g2[2].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_3 -bbox {1 1} [get_cells {g2[3].u2 g2[3].u2/meta_i1.ff_inst g2[3].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_4 -bbox {1 1} [get_cells {g2[4].u2 g2[4].u2/meta_i1.ff_inst g2[4].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_5 -bbox {1 1} [get_cells {g2[5].u2 g2[5].u2/meta_i1.ff_inst g2[5].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_6 -bbox {1 1} [get_cells {g2[6].u2 g2[6].u2/meta_i1.ff_inst g2[6].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_7 -bbox {1 1} [get_cells {g2[7].u2 g2[7].u2/meta_i1.ff_inst g2[7].u2/meta_i2.ff_inst}]
+
+# -----------------------------------------------------------------------------
+# Ended Message
+# -----------------------------------------------------------------------------
+#
+catch {puts "[string repeat - 80]"}
+catch {puts "certuspro_nx_evn.pdc: Ended"}
+catch {puts "[string repeat = 80]"}
+
+
+
+
+
+
+
+
