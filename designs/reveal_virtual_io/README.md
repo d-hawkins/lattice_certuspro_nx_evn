@@ -64,4 +64,19 @@ The 12MHz oscillator does not start until the USB cable is connected to the host
    * Look at the LEDs on the board to confirm the patterns.
    * Write 0 to rvl_led_sel and the LEDs will display the counting pattern.
    
+8. Use the Radiant Tcl console  to control the Reveal Virtual I/O Controller  
+   Click on the Tcl console tab in the Radiant GUI and then try some of the following:
+   ~~~
+   # Use Reveal to control the LEDs
+   rva_run_controller -write_control "CON0" -data "1"
    
+   # Green LEDs count
+   for {set i 0} {$i < 255} {incr i} {set data [format "%.2X" $i]; rva_run_controller -write_control "CON1" -data $data;after 100;}
+   
+   # Red LEDs count
+   for {set i 0} {$i < 255} {incr i} {set data [format "%.2X" $i]; rva_run_controller -write_control "CON2" -data $data;after 100;}
+   
+   # Yellow LEDs count
+   for {set i 0} {$i < 255} {incr i} {set data [format "%.2X" $i]; rva_run_controller -write_control "CON3" -data $data;after 100;}
+   ~~~  
+  
