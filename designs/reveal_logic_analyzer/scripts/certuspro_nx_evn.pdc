@@ -86,18 +86,18 @@ apply_pin_constraints $ports $pin_constraints
 # Asynchronous input synchronizers
 # -----------------------------------------------------------------------------
 #
-ldc_create_group -name group_cdc_g1_0 [get_cells {g1[0].u1 g1[0].u1/meta_i1.ff_inst g1[0].u1/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g1_1 [get_cells {g1[1].u1 g1[1].u1/meta_i1.ff_inst g1[1].u1/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g1_2 [get_cells {g1[2].u1 g1[2].u1/meta_i1.ff_inst g1[2].u1/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g1_0 -bbox {1 1} [get_cells {g1[0].u1 g1[0].u1/meta_i1.ff_inst g1[0].u1/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g1_1 -bbox {1 1} [get_cells {g1[1].u1 g1[1].u1/meta_i1.ff_inst g1[1].u1/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g1_2 -bbox {1 1} [get_cells {g1[2].u1 g1[2].u1/meta_i1.ff_inst g1[2].u1/meta_i2.ff_inst}]
 
-ldc_create_group -name group_cdc_g2_0 [get_cells {g2[0].u2 g2[0].u2/meta_i1.ff_inst g2[0].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_1 [get_cells {g2[1].u2 g2[1].u2/meta_i1.ff_inst g2[1].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_2 [get_cells {g2[2].u2 g2[2].u2/meta_i1.ff_inst g2[2].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_3 [get_cells {g2[3].u2 g2[3].u2/meta_i1.ff_inst g2[3].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_4 [get_cells {g2[4].u2 g2[4].u2/meta_i1.ff_inst g2[4].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_5 [get_cells {g2[5].u2 g2[5].u2/meta_i1.ff_inst g2[5].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_6 [get_cells {g2[6].u2 g2[6].u2/meta_i1.ff_inst g2[6].u2/meta_i2.ff_inst}]
-ldc_create_group -name group_cdc_g2_7 [get_cells {g2[7].u2 g2[7].u2/meta_i1.ff_inst g2[7].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_0 -bbox {1 1} [get_cells {g2[0].u2 g2[0].u2/meta_i1.ff_inst g2[0].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_1 -bbox {1 1} [get_cells {g2[1].u2 g2[1].u2/meta_i1.ff_inst g2[1].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_2 -bbox {1 1} [get_cells {g2[2].u2 g2[2].u2/meta_i1.ff_inst g2[2].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_3 -bbox {1 1} [get_cells {g2[3].u2 g2[3].u2/meta_i1.ff_inst g2[3].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_4 -bbox {1 1} [get_cells {g2[4].u2 g2[4].u2/meta_i1.ff_inst g2[4].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_5 -bbox {1 1} [get_cells {g2[5].u2 g2[5].u2/meta_i1.ff_inst g2[5].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_6 -bbox {1 1} [get_cells {g2[6].u2 g2[6].u2/meta_i1.ff_inst g2[6].u2/meta_i2.ff_inst}]
+ldc_create_group -name group_cdc_g2_7 -bbox {1 1} [get_cells {g2[7].u2 g2[7].u2/meta_i1.ff_inst g2[7].u2/meta_i2.ff_inst}]
 
 # -----------------------------------------------------------------------------
 # Ended Message
