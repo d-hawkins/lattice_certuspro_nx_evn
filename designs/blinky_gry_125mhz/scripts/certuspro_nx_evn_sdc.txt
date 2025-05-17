@@ -1,0 +1,51 @@
+# -----------------------------------------------------------------------------
+# certuspro_nx_evn.sdc
+#
+# DATE_VAL D. W. Hawkins (dwh@caltech.edu)
+#
+# Lattice Radiant Timing Constraints.
+#
+#  *** WARNING: This is a generated file ***
+#
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Design Parameters
+# -----------------------------------------------------------------------------
+#
+set USEIOFF               USEIOFF_VAL
+set CLK_125MHZ_FREQUENCY  CLK_125MHZ_FREQUENCY_VAL
+set LED_OUTPUT_MIN        LED_OUTPUT_MIN_VAL
+set LED_OUTPUT_MAX        LED_OUTPUT_MAX_VAL
+
+# =============================================================================
+# 125MHz Clock Domain
+# =============================================================================
+#
+# -----------------------------------------------------------------------------
+# Clock Constraints
+# -----------------------------------------------------------------------------
+#
+set clk_125mhz_period [format "%.3f" [expr {1.0e9/$CLK_125MHZ_FREQUENCY}]]
+create_clock -name {clk_125mhz} -period $clk_125mhz_period [get_ports clk_125mhz]
+set_clock_groups -group [get_clocks clk_125mhz] -asynchronous
+
+# -----------------------------------------------------------------------------
+# Output Constraints
+# -----------------------------------------------------------------------------
+#
+# Constraints
+set min -$LED_OUTPUT_MIN
+set max [expr {$clk_125mhz_period - $LED_OUTPUT_MAX}]
+
+# Green LEDs
+set_output_delay -clock [get_clocks clk_125mhz] -min $min [get_ports {led_g[*]}]
+set_output_delay -clock [get_clocks clk_125mhz] -max $max [get_ports {led_g[*]}]
+
+# Red LEDs
+set_output_delay -clock [get_clocks clk_125mhz] -min $min [get_ports {led_r[*]}]
+set_output_delay -clock [get_clocks clk_125mhz] -max $max [get_ports {led_r[*]}]
+
+# Yellow LEDs
+set_output_delay -clock [get_clocks clk_125mhz] -min $min [get_ports {led_y[*]}]
+set_output_delay -clock [get_clocks clk_125mhz] -max $max [get_ports {led_y[*]}]
