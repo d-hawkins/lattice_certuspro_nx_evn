@@ -65,7 +65,11 @@ proc get_pin_constraints {} {
 	# Clocks
 	# -------------------------------------------------------------------------
 	#
-	dict set pin clk_12mhz {PIN R4}
+	# Bank 1 (3.3V)
+	dict set pin clk_12mhz  {PIN R4   IO_TYPE LVCMOS33}
+
+	# Bank 7 (3.3V)
+	dict set pin clk_125mhz {PIN N25  IO_TYPE LVCMOS33}
 
 	# -------------------------------------------------------------------------
 	# Green LEDs
