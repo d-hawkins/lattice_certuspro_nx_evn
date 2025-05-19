@@ -295,6 +295,7 @@ module  ahblite_example_tb;
 
 		// Read burst data (pre-allocate the array)
 		rbdata = new[len];
+		addr = '0;
 		m_vif.read_word_burst_incr(addr, len, rbdata);
 
 		$display("Read %0d locations", len);
